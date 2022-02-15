@@ -52,7 +52,7 @@ LCD_COL:
 	breq UP
 	cpi r16, 5
 	breq RIGHT
-	//bestäm vad knappar ska göra
+	
 SELECT:
 	lds r16,CUR_POS
 	cpi r20, 1
@@ -67,21 +67,21 @@ OFF:
 	jmp RETURN
 
 DOWN:
-	call INIT_PEKARE //kollar upp vad för värde som finns där cur_pos pekar
+	call INIT_PEKARE 
 	cpi r16, $00 
-	breq IS_Z_NOW //om det är noll eller A så blir det Z
+	breq IS_Z_NOW 
 	cpi r16, $41
 	breq IS_Z_NOW
 	dec r16
 	jmp store
-IS_Z_NOW:	//flyttade in is_*_now innanför labeln efter komplettering.
+IS_Z_NOW:	
 	ldi r16, $5A
 	jmp STORE
 
 UP:
 	call INIT_PEKARE 
 	cpi r16, $00
-	breq IS_A_NOW //Samma som ovan fast om det blir A om det är 0 eller Z
+	breq IS_A_NOW 
 	cpi r16, $5A
 	breq IS_A_NOW
 	inc r16
@@ -92,25 +92,25 @@ IS_A_NOW:
 
 LEFT:
 	lds r16,CUR_POS
-	cpi r16,0 //om positionen är noll så kan vi inte hoppa mer åt vänster
+	cpi r16,0 
 	breq RETURN
-	dec r16 //annars dec och lagra värdet
+	dec r16
 	sts CUR_POS,r16
-	ldi r16, $10 //hoppa åt vänster
+	ldi r16, $10 
 	jmp EXECUTE
 
 RIGHT:
 	lds r16,CUR_POS
-	cpi r16,15 //samma fast med 15 och åt höger, annars inc
+	cpi r16,15 
 	breq RETURN
 	inc r16
 	sts CUR_POS,r16
-	ldi r16 , $16 //hoppa åt höger
+	ldi r16 , $16 
 	jmp EXECUTE
 STORE:
-	st x,r16 //skriver ut värdet i r16
+	st x,r16 
 	call LCD_ASCII
-	ldi r16,$10 //hoppa tillbaka till vänster när du skrivit ut nått på displayen
+	ldi r16,$10
 EXECUTE:
 	call LCD_COMMAND
 RETURN:
@@ -122,7 +122,7 @@ INIT_PEKARE:
 	ret
 
 
-ADC_READ8: //AD-omvandling som lagrar värde i r16
+ADC_READ8: 
 	ldi r16,(1<<REFS0)|(1<<ADLAR)|0 
 	sts ADMUX,r16 
 	ldi r16,(1 << ADEN)|7 
@@ -138,7 +138,7 @@ ADC_BUSY:
 	lds r16,ADCH 
 	ret
 
-KEY_READ: //läser värden
+KEY_READ: 
 	call KEY
 	tst r16
 	brne KEY_READ
@@ -149,9 +149,9 @@ KEY_WAIT_FOR_PRESS:
 	ret
 
 KEY:
-	call ADC_READ8 //AD omvandling som laddar r16 med värde
+	call ADC_READ8 
 	cpi r16,12 
-	brlo K5 //branch if lower
+	brlo K5 
 	cpi r16,43 
 	brlo K4
 	cpi r16,82 
@@ -181,7 +181,7 @@ DONE:
 	ret
 
 
-PORT_INIT: //initierar portarna
+PORT_INIT: 
 	ldi r16, $FF
 	out DDRB, r16
 	out DDRD, r16
@@ -189,7 +189,7 @@ PORT_INIT: //initierar portarna
 	ret
 
 
-DISPLAY_INIT: //initierar lcd:n
+DISPLAY_INIT: 
 	Call BACKLIGHT_ON
 	call WAIT
 
@@ -246,7 +246,7 @@ LCD_WRITE8:
 	call LCD_WRITE4
 	ret
 
-WAIT: //delayen, ca 16 ms
+WAIT: 
 	adiw r24,1
 	brne WAIT
 	ret
@@ -278,7 +278,7 @@ LCD_ERASE:
 	call LCD_COMMAND
 	ret
 
-MRCLEAN: //rensar minnet i arduinon
+MRCLEAN:
     ldi XH,HIGH(TIME)
     ldi XL,LOW(TIME)
     ldi r17, 40
